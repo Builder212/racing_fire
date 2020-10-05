@@ -1,10 +1,11 @@
 import pygame, time, random
 
 class main_game:
-	def __init__(self, x, y, terrain_image, road_image, car_image, exploded_car, pothole_image):
+	def __init__(self, x=350, y=814, terrain_image="textures/grass_background.png", road_image="textures/road_background.png", car_image="textures/car.png"):
 		self.screen = pygame.display.set_mode((x, y))
+		self.running = True
 		self.menu = True
-		self.running = False
+		self.game = False
 		self.end = False
 
 		self.display_width = x
@@ -16,15 +17,15 @@ class main_game:
 		self.distance = 0
 		self.y_val = 0
 
-		self.death_screen = pygame.image.load("textures/death_screen.png")
-		self.menu_background = pygame.image.load("textures/menu_background.png")
+		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
+		self.menu_background = pygame.image.load("textures/menu_background.png").convert_alpha()
 		self.terrain = pygame.image.load(terrain_image).convert_alpha()
 		self.road = pygame.image.load(road_image).convert_alpha()
 
 		self.car = pygame.image.load(car_image).convert_alpha()
 		self.car_hitbox = (self.x, self.y, 51, 111)
 
-		self.pothole = pygame.image.load(pothole_image).convert_alpha()
+		self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
 		self.pothole_side = random.randrange(30, 100)
 		self.pothole_angle = random.randrange(0, 360)
 		self.pothole_startx = random.randrange(25, (self.display_width-25-self.pothole_side))
@@ -44,7 +45,7 @@ class main_game:
 	def events(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				self.running = False
+				self.game = False
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					self.x_change = -1
@@ -87,11 +88,19 @@ class main_game:
 			pass
 
 	def crash(self):
-		self.running = False
+		self.game = False
+		self.end = True
 		self.screen.blit(self.death_screen, (0,0))
 		pygame.display.update()
-		time.sleep(5)
-		exit()
+
+	def end_screen(self):
+		while self.end == True:
+			for event in pygame.event.get():
+				if pygame.mouse.get_pressed()[0] == 1: # menu
+					if 26 <= pygame.mouse.get_pos()[0] <= 299:
+						if 320 <= pygame.mouse.get_pos()[1] <= 430:
+							self.end = False
+							self.menu = True
 
 	def is_collision(self):
 		self.car_hitbox = (self.x, self.y, 51, 111)
@@ -103,26 +112,20 @@ class main_game:
 			pass
 
 	def set_speed(self):
-		if self.distance < 20:
-			pass
-		elif self.distance >= 20:
-			self.speed = self.distance // 10
-			print(self.speed)
+		if self.distance >= 10:
+			self.speed = self.distance // 5
 
-	def mainloop(self):
-		self.main_menu_setup()
-		while self.menu:
-			for event in pygame.event.get():
-				if pygame.mouse.get_pressed()[0] == 1:
-					if 26 <= pygame.mouse.get_pos()[0] <= 300:
-						if 225 <= pygame.mouse.get_pos()[1] <= 310:
-							self.menu = False
-							self.running = True
-							time.sleep(0.2)
-			print(pygame.mouse.get_pos())
+	def gameplay(self):
+		self.pothole_side = random.randrange(30, 100)
+		self.pothole_angle = random.randrange(0, 360)
+		self.pothole_startx = random.randrange(25, (self.display_width-25-self.pothole_side))
+		self.pothole_starty = -300
+		self.pothole_hitbox = ((self.pothole_side/2), self.pothole_startx, self.pothole_starty)
 
+		self.speed = 1
+		self.distance = 0
 		self.initial_load()
-		while self.running:
+		while self.game == True:
 			self.distance += 0.0005
 			self.events()
 			self.car_onscreen()
@@ -134,8 +137,33 @@ class main_game:
 			self.pothole_onscreen()
 			self.set_speed()
 
+	def main_menu(self):
+		self.main_menu_setup()
+		while self.menu == True:
+			for event in pygame.event.get():
+				if pygame.mouse.get_pressed()[0] == 1:
+					if 26 <= pygame.mouse.get_pos()[0] <= 323:
+						if 225 <= pygame.mouse.get_pos()[1] <= 310: #start
+							self.menu = False
+							self.game = True
+							self.end = False
+							time.sleep(0.1)
+						elif 334 <= pygame.mouse.get_pos()[1] <= 431: #options
+							print("options")
+						elif 444 <= pygame.mouse.get_pos()[1] <= 542: #exit
+							exit()
+
+	def mainloop(self):
+		while self.running == True:
+			self.main_menu()
+			self.initial_load()
+			self.gameplay()
+			self.end_screen()
+		time.sleep(0.1)
+		exit()
+
 if __name__ == "__main__":
 	pygame.init()
-	game = main_game(350, 814, "textures/grass_background.png", "textures/road_background.png", "textures/car.png", "textures/exploded_car.png", "textures/pothole.png")
+	game = main_game()
 	game.mainloop()
 	pygame.quit()
