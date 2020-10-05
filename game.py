@@ -7,8 +7,9 @@ class main_game:
 		self.menu = True
 		self.game = False
 		self.end = False
-		self.music = True
 		self.options = False
+
+		self.soundtrack = pygame.mixer.music.load("soundtrack.mp3")
 
 		self.display_width = x
 		self.display_height = y
@@ -155,6 +156,7 @@ class main_game:
 
 	def main_menu(self):
 		self.main_menu_setup()
+		self.options == False
 		while self.menu == True:
 			for event in pygame.event.get():
 				if pygame.mouse.get_pressed()[0] == 1:
@@ -178,19 +180,22 @@ class main_game:
 				if pygame.mouse.get_pressed()[0] == 1:
 					if 130 <= pygame.mouse.get_pos()[1] <= 200:
 						if 76 <= pygame.mouse.get_pos()[0] <= 148: #yes
-							self.music = True
-						elif 200 <= pygame.mouse.get_pos()[1] <= 269: #no
-							self.music = False
+							pygame.mixer.music.unpause()
+						elif 200 <= pygame.mouse.get_pos()[0] <= 269: #no
+							pygame.mixer.music.pause()
 					elif 715 <= pygame.mouse.get_pos()[1] <= 778:
 						if 75 <= pygame.mouse.get_pos()[0] <= 269:
 							self.main_menu()
 
 	def mainloop(self):
+		pygame.mixer.music.play(-1)
 		while self.running == True:
 			self.main_menu()
 			self.initial_load()
 			self.gameplay()
 			self.end_screen()
+		pygame.mixer.music.stop()
+		pygame.mixer.music.unload()
 		time.sleep(0.1)
 		exit()
 
