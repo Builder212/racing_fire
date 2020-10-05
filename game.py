@@ -1,12 +1,14 @@
 import pygame, time, random
 
 class main_game:
-	def __init__(self, x=350, y=814, terrain_image="textures/grass_background.png", road_image="textures/road_background.png", car_image="textures/car.png"):
+	def __init__(self, x=350, y=814, terrain_image="textures/grass_background.png", road_image="textures/road_background.png", car_image="textures/car.png", potholes= "textures/pothole.png"):
 		self.screen = pygame.display.set_mode((x, y))
 		self.running = True
 		self.menu = True
 		self.game = False
 		self.end = False
+		self.music = True
+		self.options = False
 
 		self.display_width = x
 		self.display_height = y
@@ -17,6 +19,7 @@ class main_game:
 		self.distance = 0
 		self.y_val = 0
 
+		self.options_screen = pygame.image.load("textures/options_screen.png").convert_alpha()
 		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
 		self.menu_background = pygame.image.load("textures/menu_background.png").convert_alpha()
 		self.terrain = pygame.image.load(terrain_image).convert_alpha()
@@ -25,7 +28,7 @@ class main_game:
 		self.car = pygame.image.load(car_image).convert_alpha()
 		self.car_hitbox = (self.x, self.y, 51, 111)
 
-		self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
+		self.pothole = pygame.image.load(potholes).convert_alpha()
 		self.pothole_side = random.randrange(30, 100)
 		self.pothole_angle = random.randrange(0, 360)
 		self.pothole_startx = random.randrange(25, (self.display_width-25-self.pothole_side))
@@ -149,9 +152,25 @@ class main_game:
 							self.end = False
 							time.sleep(0.1)
 						elif 334 <= pygame.mouse.get_pos()[1] <= 431: #options
-							print("options")
+							self.options_menu()
 						elif 444 <= pygame.mouse.get_pos()[1] <= 542: #exit
 							exit()
+
+	def options_menu(self):
+		self.options == True
+		self.screen.blit(self.options_screen, (0,0))
+		pygame.display.update()
+		while True:
+			for event in pygame.event.get():
+				if pygame.mouse.get_pressed()[0] == 1:
+					if 130 <= pygame.mouse.get_pos()[1] <= 200:
+						if 76 <= pygame.mouse.get_pos()[0] <= 148: #yes
+							self.music = True
+						elif 200 <= pygame.mouse.get_pos()[1] <= 269: #no
+							self.music = False
+					elif 715 <= pygame.mouse.get_pos()[1] <= 778:
+						if 75 <= pygame.mouse.get_pos()[0] <= 269:
+							self.main_menu()
 
 	def mainloop(self):
 		while self.running == True:
