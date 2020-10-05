@@ -19,6 +19,11 @@ class main_game:
 		self.distance = 0
 		self.y_val = 0
 
+		self.font = pygame.font.Font(pygame.font.get_default_font(), 36)
+		self.highscore = 0
+		self.highscore_string = "Highscore: " + str(self.highscore)
+		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
+
 		self.options_screen = pygame.image.load("textures/options_screen.png").convert_alpha()
 		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
 		self.menu_background = pygame.image.load("textures/menu_background.png").convert_alpha()
@@ -37,6 +42,7 @@ class main_game:
 
 	def main_menu_setup(self):
 		self.screen.blit(self.menu_background, (0,0))
+		self.screen.blit(self.high_score_render, (60, 760))
 		pygame.display.update()
 	def initial_load(self):
 		self.screen.blit(self.terrain, (0,0))
@@ -94,6 +100,11 @@ class main_game:
 		self.game = False
 		self.end = True
 		self.screen.blit(self.death_screen, (0,0))
+		if int(self.distance) >= self.highscore:
+			self.highscore = int(self.distance)
+		self.highscore_string = "Highscore: " + str(self.highscore)
+		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
+		self.screen.blit(self.high_score_render, (60, 760))
 		pygame.display.update()
 
 	def end_screen(self):
@@ -130,12 +141,14 @@ class main_game:
 		self.initial_load()
 		while self.game == True:
 			self.distance += 0.0005
+			self.score_render = self.font.render(str(int(self.distance)), True, (255, 255, 255))
 			self.events()
 			self.car_onscreen()
 			self.scrolling_road()
 			self.potholes()
 			self.move_car(self.x, self.y)
 			self.is_collision()
+			self.screen.blit(self.score_render, (155, 10))
 			pygame.display.update()
 			self.pothole_onscreen()
 			self.set_speed()
