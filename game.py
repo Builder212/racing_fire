@@ -1,8 +1,11 @@
-import pygame, time, random
+import pygame, time, random, pickle
 
 class main_game:
 	def __init__(self, x=350, y=814, terrain_image="textures/grass_background.png", road_image="textures/road_background.png", car_image="textures/car.png", potholes= "textures/pothole.png"):
+		pygame.init()
+		pygame.display.set_caption('Firebird')
 		self.screen = pygame.display.set_mode((x, y))
+
 		self.running = True
 		self.menu = True
 		self.game = False
@@ -21,9 +24,23 @@ class main_game:
 		self.y_val = 0
 
 		self.font = pygame.font.Font(pygame.font.get_default_font(), 36)
-		self.highscore = 0
+
+		try:
+			with open('highscore.dat', 'rb') as file:
+				self.highscore = pickle.load(file)
+		except:
+			self.highscore = 0
+
 		self.highscore_string = "Highscore: " + str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
+
+		self.start_clicked = pygame.image.load("textures/start_clicked.png").convert_alpha()
+		self.exit_clicked = pygame.image.load("textures/exit_clicked.png").convert_alpha()
+		self.options_clicked = pygame.image.load("textures/options_clicked.png").convert_alpha()
+		self.menu_clicked = pygame.image.load("textures/menu_clicked.png").convert_alpha()
+		self.music_off = pygame.image.load("textures/music_off.png").convert_alpha()
+		self.music_on = pygame.image.load("textures/music_on.png").convert_alpha()
+		self.options_exit = pygame.image.load("textures/options_exit.png").convert_alpha()
 
 		self.options_screen = pygame.image.load("textures/options_screen.png").convert_alpha()
 		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
@@ -50,12 +67,13 @@ class main_game:
 		self.screen.blit(self.road, (25,0))
 
 	def move_car(self, x, y):
-		self.screen.blit(self.car, (x, y))
+		self.screen.blit(self.car, (int(x), int(y)))
 
 	def events(self):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				self.game = False
+				pygame.quit()
+				exit()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					self.x_change = -1
@@ -73,11 +91,11 @@ class main_game:
 
 	def scrolling_road(self):
 		y = self.y_val % self.road.get_rect().height
-		self.screen.blit(self.terrain, (0, (y-self.terrain.get_rect().height)))
-		self.screen.blit(self.road, (25, (y-self.road.get_rect().height)))
+		self.screen.blit(self.terrain, (0, (int(y-self.terrain.get_rect().height))))
+		self.screen.blit(self.road, (25, (int(y-self.road.get_rect().height))))
 		if y < 814:
-			self.screen.blit(self.terrain, (0, y))
-			self.screen.blit(self.road, (25, y))
+			self.screen.blit(self.terrain, (0, int(y)))
+			self.screen.blit(self.road, (25, int(y)))
 		else:
 			pass
 		self.y_val += self.speed
@@ -85,7 +103,7 @@ class main_game:
 	def potholes(self):
 		self.resized_pothole = pygame.transform.scale(self.pothole, (self.pothole_side, self.pothole_side))
 		self.rotated_pothole = pygame.transform.rotate(self.resized_pothole, self.pothole_angle)
-		self.screen.blit(self.resized_pothole, (self.pothole_startx, self.pothole_starty))
+		self.screen.blit(self.resized_pothole, (int(self.pothole_startx), int(self.pothole_starty)))
 		self.pothole_starty += self.speed
 
 	def pothole_onscreen(self):
@@ -103,6 +121,8 @@ class main_game:
 		self.screen.blit(self.death_screen, (0,0))
 		if int(self.distance) >= self.highscore:
 			self.highscore = int(self.distance)
+			with open('highscore.dat', 'wb') as file:
+				pickle.dump(self.highscore, file)
 		self.highscore_string = "Highscore: " + str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
 		self.screen.blit(self.high_score_render, (60, 760))
@@ -111,6 +131,17 @@ class main_game:
 	def end_screen(self):
 		while self.end == True:
 			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					exit()
+				if 26 <= pygame.mouse.get_pos()[0] <= 299:
+					if 320 <= pygame.mouse.get_pos()[1] <= 430:
+						self.screen.blit(self.menu_clicked, (26, 320))
+						pygame.display.update()
+					else:
+						self.screen.blit(self.death_screen, (0,0))
+						self.screen.blit(self.high_score_render, (60, 760))
+						pygame.display.update()
 				if pygame.mouse.get_pressed()[0] == 1: # menu
 					if 26 <= pygame.mouse.get_pos()[0] <= 299:
 						if 320 <= pygame.mouse.get_pos()[1] <= 430:
@@ -159,6 +190,23 @@ class main_game:
 		self.options == False
 		while self.menu == True:
 			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					exit()
+				if 26 <= pygame.mouse.get_pos()[0] <= 323:
+					if 225 <= pygame.mouse.get_pos()[1] <= 310: #start
+						self.screen.blit(self.start_clicked, (26, 225))
+						pygame.display.update()
+					elif 334 <= pygame.mouse.get_pos()[1] <= 431: #options
+						self.screen.blit(self.options_clicked, (26, 334))
+						pygame.display.update()
+					elif 444 <= pygame.mouse.get_pos()[1] <= 542: #exit
+						self.screen.blit(self.exit_clicked, (26, 444))
+						pygame.display.update()
+					else:
+						self.screen.blit(self.menu_background, (0,0))
+						self.screen.blit(self.high_score_render, (60, 760))
+						pygame.display.update()
 				if pygame.mouse.get_pressed()[0] == 1:
 					if 26 <= pygame.mouse.get_pos()[0] <= 323:
 						if 225 <= pygame.mouse.get_pos()[1] <= 310: #start
@@ -172,11 +220,29 @@ class main_game:
 							exit()
 
 	def options_menu(self):
-		self.options == True
+		self.options = True
+		self.menu = False
 		self.screen.blit(self.options_screen, (0,0))
 		pygame.display.update()
-		while True:
+		while self.options == True:
 			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					exit()
+				if 130 <= pygame.mouse.get_pos()[1] <= 200:
+					if 76 <= pygame.mouse.get_pos()[0] <= 148: #yes
+						self.screen.blit(self.music_on, (76, 130))
+						pygame.display.update()
+					elif 200 <= pygame.mouse.get_pos()[0] <= 269: #no
+						self.screen.blit(self.music_off, (200, 130))
+						pygame.display.update()
+				elif 715 <= pygame.mouse.get_pos()[1] <= 778:
+					if 75 <= pygame.mouse.get_pos()[0] <= 269:
+						self.screen.blit(self.options_exit, (75, 715))
+						pygame.display.update()
+				else:
+					self.screen.blit(self.options_screen, (0,0))
+					pygame.display.update()
 				if pygame.mouse.get_pressed()[0] == 1:
 					if 130 <= pygame.mouse.get_pos()[1] <= 200:
 						if 76 <= pygame.mouse.get_pos()[0] <= 148: #yes
@@ -185,7 +251,10 @@ class main_game:
 							pygame.mixer.music.pause()
 					elif 715 <= pygame.mouse.get_pos()[1] <= 778:
 						if 75 <= pygame.mouse.get_pos()[0] <= 269:
-							self.main_menu()
+							self.options = False
+							self.menu = True
+		if self.menu == True:
+			self.main_menu()
 
 	def mainloop(self):
 		pygame.mixer.music.play(-1)
