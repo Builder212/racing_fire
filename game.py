@@ -1,7 +1,7 @@
 import pygame, time, random, pickle
 
 class main_game:
-	def __init__(self, x=350, y=814, terrain_image="textures/grass_background.png", road_image="textures/road_background.png", car_image="textures/car.png", potholes= "textures/pothole.png"):
+	def __init__(self, x=350, y=814):
 		pygame.init()
 		pygame.display.set_caption('Firebird')
 		self.screen = pygame.display.set_mode((x, y))
@@ -26,7 +26,13 @@ class main_game:
 		self.font = pygame.font.Font(pygame.font.get_default_font(), 36)
 
 		try:
-			with open('highscore.dat', 'rb') as file:
+			with open('data/world.dat', 'rb') as file:
+				self.world = pickle.load(file)
+		except:
+			self.world = 0
+
+		try:
+			with open('data/highscore.dat', 'rb') as file:
 				self.highscore = pickle.load(file)
 		except:
 			self.highscore = 0
@@ -45,13 +51,23 @@ class main_game:
 		self.options_screen = pygame.image.load("textures/options_screen.png").convert_alpha()
 		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
 		self.menu_background = pygame.image.load("textures/menu_background.png").convert_alpha()
-		self.terrain = pygame.image.load(terrain_image).convert_alpha()
-		self.road = pygame.image.load(road_image).convert_alpha()
 
-		self.car = pygame.image.load(car_image).convert_alpha()
+		if self.world == 0:
+			self.terrain = pygame.image.load("textures/grass_background.png").convert_alpha()
+			self.road = pygame.image.load("textures/road_background.png").convert_alpha()
+			self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
+		elif self.world == 1:
+			self.terrain = pygame.image.load("textures/snow_background.png").convert_alpha()
+			self.road = pygame.image.load("textures/ice_road_background.png").convert_alpha()
+			self.pothole = pygame.image.load("textures/snow_pile.png").convert_alpha()
+		elif self.world == 2:
+			self.terrain = pygame.image.load("textures/heavy_grass_background.png").convert_alpha()
+			self.road = pygame.image.load("textures/dirt_road_background.png").convert_alpha()
+			self.pothole = pygame.image.load("textures/rocks.png").convert_alpha()
+
+		self.car = pygame.image.load("textures/car.png").convert_alpha()
 		self.car_hitbox = (self.x, self.y, 51, 111)
 
-		self.pothole = pygame.image.load(potholes).convert_alpha()
 		self.pothole_side = random.randrange(30, 100)
 		self.pothole_angle = random.randrange(0, 360)
 		self.pothole_startx = random.randrange(25, (self.display_width-25-self.pothole_side))
@@ -121,7 +137,7 @@ class main_game:
 		self.screen.blit(self.death_screen, (0,0))
 		if int(self.distance) >= self.highscore:
 			self.highscore = int(self.distance)
-			with open('highscore.dat', 'wb') as file:
+			with open('data/highscore.dat', 'wb') as file:
 				pickle.dump(self.highscore, file)
 		self.highscore_string = "Highscore: " + str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
@@ -237,7 +253,7 @@ class main_game:
 						self.screen.blit(self.music_off, (200, 130))
 						pygame.display.update()
 				elif 715 <= pygame.mouse.get_pos()[1] <= 778:
-					if 75 <= pygame.mouse.get_pos()[0] <= 269:
+					if 75 <= pygame.mouse.get_pos()[0] <= 269: #exit
 						self.screen.blit(self.options_exit, (75, 715))
 						pygame.display.update()
 				else:
@@ -249,10 +265,32 @@ class main_game:
 							pygame.mixer.music.unpause()
 						elif 200 <= pygame.mouse.get_pos()[0] <= 269: #no
 							pygame.mixer.music.pause()
+					elif 219 <= pygame.mouse.get_pos()[1] <= 317:
+						if 17 <= pygame.mouse.get_pos()[0] <= 109: #default
+							self.terrain = pygame.image.load("textures/grass_background.png").convert_alpha()
+							self.road = pygame.image.load("textures/road_background.png").convert_alpha()
+							self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
+							with open('data/world.dat', 'wb') as file:
+								pickle.dump(self.world, file)
+						elif 129 <= pygame.mouse.get_pos()[0] <= 220: #snow
+							self.world = 1
+							self.terrain = pygame.image.load("textures/snow_background.png").convert_alpha()
+							self.road = pygame.image.load("textures/ice_road_background.png").convert_alpha()
+							self.pothole = pygame.image.load("textures/snow_pile.png").convert_alpha()
+							with open('data/world.dat', 'wb') as file:
+								pickle.dump(self.world, file)
+						elif 239 <= pygame.mouse.get_pos()[0] <= 332: #jungle
+							self.world = 2
+							self.terrain = pygame.image.load("textures/heavy_grass_background.png").convert_alpha()
+							self.road = pygame.image.load("textures/dirt_road_background.png").convert_alpha()
+							self.pothole = pygame.image.load("textures/rocks.png").convert_alpha()
+							with open('data/world.dat', 'wb') as file:
+								pickle.dump(self.world, file)
 					elif 715 <= pygame.mouse.get_pos()[1] <= 778:
-						if 75 <= pygame.mouse.get_pos()[0] <= 269:
+						if 75 <= pygame.mouse.get_pos()[0] <= 269: #exit
 							self.options = False
 							self.menu = True
+
 		if self.menu == True:
 			self.main_menu()
 
