@@ -47,7 +47,10 @@ class main_game:
 		self.music_off = pygame.image.load("textures/music_off.png").convert_alpha()
 		self.music_on = pygame.image.load("textures/music_on.png").convert_alpha()
 		self.options_exit = pygame.image.load("textures/options_exit.png").convert_alpha()
-
+		self.default_clicked = pygame.image.load("textures/sky_selected.png").convert_alpha()
+		self.ice_clicked = pygame.image.load("textures/ice_selected.png").convert_alpha()
+		self.jungle_clicked = pygame.image.load("textures/jungle_clicked.png").convert_alpha()
+		self.selected_background = pygame.image.load("textures/selected_background.png").convert_alpha()
 		self.options_screen = pygame.image.load("textures/options_screen.png").convert_alpha()
 		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
 		self.menu_background = pygame.image.load("textures/menu_background.png").convert_alpha()
@@ -239,6 +242,12 @@ class main_game:
 		self.options = True
 		self.menu = False
 		self.screen.blit(self.options_screen, (0,0))
+		if self.world == 0:
+			self.screen.blit(self.selected_background, (17, 220))
+		elif self.world == 1:
+			self.screen.blit(self.selected_background, (129, 221))
+		elif self.world == 2:
+			self.screen.blit(self.selected_background, (239, 219))
 		pygame.display.update()
 		while self.options == True:
 			for event in pygame.event.get():
@@ -250,14 +259,30 @@ class main_game:
 						self.screen.blit(self.music_on, (76, 130))
 						pygame.display.update()
 					elif 200 <= pygame.mouse.get_pos()[0] <= 269: #no
-						self.screen.blit(self.music_off, (200, 130))
+						self.screen.blit(self.music_off, (197, 130))
 						pygame.display.update()
 				elif 715 <= pygame.mouse.get_pos()[1] <= 778:
 					if 75 <= pygame.mouse.get_pos()[0] <= 269: #exit
 						self.screen.blit(self.options_exit, (75, 715))
 						pygame.display.update()
+				elif 219 <= pygame.mouse.get_pos()[1] <= 317:
+					if 17 <= pygame.mouse.get_pos()[0] <= 109: #default
+						self.screen.blit(self.default_clicked, (17, 220))
+						pygame.display.update()
+					elif 129 <= pygame.mouse.get_pos()[0] <= 220: #snow
+						self.screen.blit(self.ice_clicked, (129, 221))
+						pygame.display.update()
+					elif 239 <= pygame.mouse.get_pos()[0] <= 332: #jungle
+						self.screen.blit(self.jungle_clicked, (239, 219))
+						pygame.display.update()
 				else:
 					self.screen.blit(self.options_screen, (0,0))
+					if self.world == 0:
+						self.screen.blit(self.selected_background, (17, 220))
+					elif self.world == 1:
+						self.screen.blit(self.selected_background, (129, 221))
+					elif self.world == 2:
+						self.screen.blit(self.selected_background, (239, 219))
 					pygame.display.update()
 				if pygame.mouse.get_pressed()[0] == 1:
 					if 130 <= pygame.mouse.get_pos()[1] <= 200:
@@ -267,6 +292,7 @@ class main_game:
 							pygame.mixer.music.pause()
 					elif 219 <= pygame.mouse.get_pos()[1] <= 317:
 						if 17 <= pygame.mouse.get_pos()[0] <= 109: #default
+							self.world = 0
 							self.terrain = pygame.image.load("textures/grass_background.png").convert_alpha()
 							self.road = pygame.image.load("textures/road_background.png").convert_alpha()
 							self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
@@ -304,10 +330,9 @@ class main_game:
 		pygame.mixer.music.stop()
 		pygame.mixer.music.unload()
 		time.sleep(0.1)
+		pygame.quit()
 		exit()
 
 if __name__ == "__main__":
-	pygame.init()
 	game = main_game()
 	game.mainloop()
-	pygame.quit()
