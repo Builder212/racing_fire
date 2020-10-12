@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pygame, time, random, pickle
 
 class main_game:
