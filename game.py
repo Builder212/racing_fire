@@ -37,38 +37,40 @@ class main_game:
 		except:
 			self.highscore = 0
 
-		self.highscore_string = "Highscore: " + str(self.highscore)
+		self.highscore_string = str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
 
-		self.start_clicked = pygame.image.load("textures/start_clicked.png").convert_alpha()
-		self.exit_clicked = pygame.image.load("textures/exit_clicked.png").convert_alpha()
-		self.options_clicked = pygame.image.load("textures/options_clicked.png").convert_alpha()
-		self.menu_clicked = pygame.image.load("textures/menu_clicked.png").convert_alpha()
-		self.music_off = pygame.image.load("textures/music_off.png").convert_alpha()
-		self.music_on = pygame.image.load("textures/music_on.png").convert_alpha()
-		self.options_exit = pygame.image.load("textures/options_exit.png").convert_alpha()
-		self.default_clicked = pygame.image.load("textures/sky_selected.png").convert_alpha()
-		self.ice_clicked = pygame.image.load("textures/ice_selected.png").convert_alpha()
-		self.jungle_clicked = pygame.image.load("textures/jungle_clicked.png").convert_alpha()
-		self.selected_background = pygame.image.load("textures/selected_background.png").convert_alpha()
-		self.options_screen = pygame.image.load("textures/options_screen.png").convert_alpha()
-		self.death_screen = pygame.image.load("textures/death_screen.png").convert_alpha()
-		self.menu_background = pygame.image.load("textures/menu_background.png").convert_alpha()
+		self.start_clicked = pygame.image.load("textures/main_menu/menu_start_clicked.png").convert_alpha()
+		self.exit_clicked = pygame.image.load("textures/main_menu/menu_exit_clicked.png").convert_alpha()
+		self.options_clicked = pygame.image.load("textures/main_menu/menu_options_clicked.png").convert_alpha()
+		self.menu_background = pygame.image.load("textures/main_menu/menu_background.png").convert_alpha()
+
+		self.menu_clicked = pygame.image.load("textures/exit_menu/menu_button_hover.png").convert_alpha()
+		self.death_screen = pygame.image.load("textures/exit_menu/exit_menu.png").convert_alpha()
+
+		self.music_off = pygame.image.load("textures/options_menu/music_off_hover.png").convert_alpha()
+		self.music_on = pygame.image.load("textures/options_menu/music_on_hover.png").convert_alpha()
+		self.off_selected = pygame.image.load("textures/options_menu/music_off_selected.png").convert_alpha()
+		self.on_selected = pygame.image.load("textures/options_menu/music_on_selected.png").convert_alpha()
+		self.options_exit = pygame.image.load("textures/options_menu/options_back_hover.png").convert_alpha()
+		self.background_hover = pygame.image.load("textures/options_menu/hover_background.png").convert_alpha()
+		self.selected_background = pygame.image.load("textures/options_menu/selected_background.png").convert_alpha()
+		self.options_screen = pygame.image.load("textures/options_menu/options_background.png").convert_alpha()
 
 		if self.world == 0:
-			self.terrain = pygame.image.load("textures/grass_background.png").convert_alpha()
-			self.road = pygame.image.load("textures/road_background.png").convert_alpha()
-			self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
+			self.terrain = pygame.image.load("textures/scenery/road/grass_background.png").convert_alpha()
+			self.road = pygame.image.load("textures/scenery/road/road_background.png").convert_alpha()
+			self.pothole = pygame.image.load("textures/scenery/road/pothole.png").convert_alpha()
 		elif self.world == 1:
-			self.terrain = pygame.image.load("textures/snow_background.png").convert_alpha()
-			self.road = pygame.image.load("textures/ice_road_background.png").convert_alpha()
-			self.pothole = pygame.image.load("textures/snow_pile.png").convert_alpha()
+			self.terrain = pygame.image.load("textures/scenery/ice/snow_background.png").convert_alpha()
+			self.road = pygame.image.load("textures/scenery/ice/ice_road_background.png").convert_alpha()
+			self.pothole = pygame.image.load("textures/scenery/ice/snow_pile.png").convert_alpha()
 		elif self.world == 2:
-			self.terrain = pygame.image.load("textures/heavy_grass_background.png").convert_alpha()
-			self.road = pygame.image.load("textures/dirt_road_background.png").convert_alpha()
-			self.pothole = pygame.image.load("textures/rocks.png").convert_alpha()
+			self.terrain = pygame.image.load("textures/scenery/jungle/heavy_grass_background.png").convert_alpha()
+			self.road = pygame.image.load("textures/scenery/jungle/dirt_road_background.png").convert_alpha()
+			self.pothole = pygame.image.load("textures/scenery/jungle/rocks.png").convert_alpha()
 
-		self.car = pygame.image.load("textures/car.png").convert_alpha()
+		self.car = pygame.image.load("textures/cars/firebird.png").convert_alpha()
 		self.car_hitbox = (self.x, self.y, 51, 111)
 
 		self.pothole_side = random.randrange(30, 100)
@@ -79,7 +81,7 @@ class main_game:
 
 	def main_menu_setup(self):
 		self.screen.blit(self.menu_background, (0,0))
-		self.screen.blit(self.high_score_render, (60, 760))
+		self.screen.blit(self.high_score_render, (256, 766))
 		pygame.display.update()
 	def initial_load(self):
 		self.screen.blit(self.terrain, (0,0))
@@ -142,7 +144,7 @@ class main_game:
 			self.highscore = int(self.distance)
 			with open('data/highscore.dat', 'wb') as file:
 				pickle.dump(self.highscore, file)
-		self.highscore_string = "Highscore: " + str(self.highscore)
+		self.highscore_string = str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
 		self.screen.blit(self.high_score_render, (60, 760))
 		pygame.display.update()
@@ -178,7 +180,7 @@ class main_game:
 
 	def set_speed(self):
 		if self.distance >= 10:
-			self.speed = self.distance // 5
+			self.speed = 1 + (self.distance // 20)
 
 	def gameplay(self):
 		self.pothole_side = random.randrange(30, 100)
@@ -212,30 +214,30 @@ class main_game:
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
-				if 26 <= pygame.mouse.get_pos()[0] <= 323:
-					if 225 <= pygame.mouse.get_pos()[1] <= 310: #start
-						self.screen.blit(self.start_clicked, (26, 225))
+				if 35 <= pygame.mouse.get_pos()[0] <= 315:
+					if 216 <= pygame.mouse.get_pos()[1] <= 306: #start
+						self.screen.blit(self.start_clicked, (35, 220))
 						pygame.display.update()
-					elif 334 <= pygame.mouse.get_pos()[1] <= 431: #options
-						self.screen.blit(self.options_clicked, (26, 334))
+					elif 336 <= pygame.mouse.get_pos()[1] <= 426: #options
+						self.screen.blit(self.options_clicked, (35, 336))
 						pygame.display.update()
-					elif 444 <= pygame.mouse.get_pos()[1] <= 542: #exit
-						self.screen.blit(self.exit_clicked, (26, 444))
+					elif 450 <= pygame.mouse.get_pos()[1] <= 540: #exit
+						self.screen.blit(self.exit_clicked, (35, 450))
 						pygame.display.update()
 					else:
 						self.screen.blit(self.menu_background, (0,0))
-						self.screen.blit(self.high_score_render, (60, 760))
+						self.screen.blit(self.high_score_render, (256, 766))
 						pygame.display.update()
 				if pygame.mouse.get_pressed()[0] == 1:
-					if 26 <= pygame.mouse.get_pos()[0] <= 323:
-						if 225 <= pygame.mouse.get_pos()[1] <= 310: #start
+					if 35 <= pygame.mouse.get_pos()[0] <= 315:
+						if 216 <= pygame.mouse.get_pos()[1] <= 306: #start
 							self.menu = False
 							self.game = True
 							self.end = False
 							time.sleep(0.1)
-						elif 334 <= pygame.mouse.get_pos()[1] <= 431: #options
+						elif 336 <= pygame.mouse.get_pos()[1] <= 426: #options
 							self.options_menu()
-						elif 444 <= pygame.mouse.get_pos()[1] <= 542: #exit
+						elif 450 <= pygame.mouse.get_pos()[1] <= 540: #exit
 							exit()
 
 	def options_menu(self):
@@ -243,46 +245,46 @@ class main_game:
 		self.menu = False
 		self.screen.blit(self.options_screen, (0,0))
 		if self.world == 0:
-			self.screen.blit(self.selected_background, (17, 220))
+			self.screen.blit(self.selected_background, (13, 80))
 		elif self.world == 1:
-			self.screen.blit(self.selected_background, (129, 221))
+			self.screen.blit(self.selected_background, (126, 80))
 		elif self.world == 2:
-			self.screen.blit(self.selected_background, (239, 219))
+			self.screen.blit(self.selected_background, (206, 80))
 		pygame.display.update()
 		while self.options == True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
-				if 130 <= pygame.mouse.get_pos()[1] <= 200:
-					if 76 <= pygame.mouse.get_pos()[0] <= 148: #yes
-						self.screen.blit(self.music_on, (76, 130))
+				if 12 <= pygame.mouse.get_pos()[1] <= 67:
+					if 206 <= pygame.mouse.get_pos()[0] <= 250: #yes
+						self.screen.blit(self.music_on, (206, 12))
 						pygame.display.update()
-					elif 200 <= pygame.mouse.get_pos()[0] <= 269: #no
-						self.screen.blit(self.music_off, (197, 130))
+					elif 269 <= pygame.mouse.get_pos()[0] <= 304: #no
+						self.screen.blit(self.music_off, (269, 12))
 						pygame.display.update()
-				elif 715 <= pygame.mouse.get_pos()[1] <= 778:
-					if 75 <= pygame.mouse.get_pos()[0] <= 269: #exit
-						self.screen.blit(self.options_exit, (75, 715))
+				elif 760 <= pygame.mouse.get_pos()[1] <= 805:
+					if 88 <= pygame.mouse.get_pos()[0] <= 262: #exit
+						self.screen.blit(self.options_exit, (88, 760))
 						pygame.display.update()
-				elif 219 <= pygame.mouse.get_pos()[1] <= 317:
-					if 17 <= pygame.mouse.get_pos()[0] <= 109: #default
-						self.screen.blit(self.default_clicked, (17, 220))
+				elif 80 <= pygame.mouse.get_pos()[1] <= 180:
+					if 13 <= pygame.mouse.get_pos()[0] <= 113: #default
+						self.screen.blit(self.background_hover, (13, 80))
 						pygame.display.update()
-					elif 129 <= pygame.mouse.get_pos()[0] <= 220: #snow
-						self.screen.blit(self.ice_clicked, (129, 221))
+					elif 125 <= pygame.mouse.get_pos()[0] <= 225: #ice
+						self.screen.blit(self.background_hover, (125, 80))
 						pygame.display.update()
-					elif 239 <= pygame.mouse.get_pos()[0] <= 332: #jungle
-						self.screen.blit(self.jungle_clicked, (239, 219))
+					elif 237 <= pygame.mouse.get_pos()[0] <= 337: #jungle
+						self.screen.blit(self.background_hover, (237, 80))
 						pygame.display.update()
 				else:
 					self.screen.blit(self.options_screen, (0,0))
 					if self.world == 0:
-						self.screen.blit(self.selected_background, (17, 220))
+						self.screen.blit(self.selected_background, (13, 80))
 					elif self.world == 1:
-						self.screen.blit(self.selected_background, (129, 221))
+						self.screen.blit(self.selected_background, (125, 80))
 					elif self.world == 2:
-						self.screen.blit(self.selected_background, (239, 219))
+						self.screen.blit(self.selected_background, (237, 80))
 					pygame.display.update()
 				if pygame.mouse.get_pressed()[0] == 1:
 					if 130 <= pygame.mouse.get_pos()[1] <= 200:
@@ -290,26 +292,26 @@ class main_game:
 							pygame.mixer.music.unpause()
 						elif 200 <= pygame.mouse.get_pos()[0] <= 269: #no
 							pygame.mixer.music.pause()
-					elif 219 <= pygame.mouse.get_pos()[1] <= 317:
-						if 17 <= pygame.mouse.get_pos()[0] <= 109: #default
+					elif 80 <= pygame.mouse.get_pos()[1] <= 180:
+						if 13 <= pygame.mouse.get_pos()[0] <= 113: #default
 							self.world = 0
-							self.terrain = pygame.image.load("textures/grass_background.png").convert_alpha()
-							self.road = pygame.image.load("textures/road_background.png").convert_alpha()
-							self.pothole = pygame.image.load("textures/pothole.png").convert_alpha()
+							self.terrain = pygame.image.load("textures/scenery/road/grass_background.png").convert_alpha()
+							self.road = pygame.image.load("textures/scenery/road/road_background.png").convert_alpha()
+							self.pothole = pygame.image.load("textures/scenery/road/pothole.png").convert_alpha()
 							with open('data/world.dat', 'wb') as file:
 								pickle.dump(self.world, file)
-						elif 129 <= pygame.mouse.get_pos()[0] <= 220: #snow
+						elif 125 <= pygame.mouse.get_pos()[0] <= 225: #snow
 							self.world = 1
-							self.terrain = pygame.image.load("textures/snow_background.png").convert_alpha()
-							self.road = pygame.image.load("textures/ice_road_background.png").convert_alpha()
-							self.pothole = pygame.image.load("textures/snow_pile.png").convert_alpha()
+							self.terrain = pygame.image.load("textures/scenery/ice/snow_background.png").convert_alpha()
+							self.road = pygame.image.load("textures/scenery/ice/ice_road_background.png").convert_alpha()
+							self.pothole = pygame.image.load("textures/scenery/ice/snow_pile.png").convert_alpha()
 							with open('data/world.dat', 'wb') as file:
 								pickle.dump(self.world, file)
-						elif 239 <= pygame.mouse.get_pos()[0] <= 332: #jungle
+						elif 237 <= pygame.mouse.get_pos()[0] <= 337: #jungle
 							self.world = 2
-							self.terrain = pygame.image.load("textures/heavy_grass_background.png").convert_alpha()
-							self.road = pygame.image.load("textures/dirt_road_background.png").convert_alpha()
-							self.pothole = pygame.image.load("textures/rocks.png").convert_alpha()
+							self.terrain = pygame.image.load("textures/scenery/jungle/heavy_grass_background.png").convert_alpha()
+							self.road = pygame.image.load("textures/scenery/jungle/dirt_road_background.png").convert_alpha()
+							self.pothole = pygame.image.load("textures/scenery/jungle/rocks.png").convert_alpha()
 							with open('data/world.dat', 'wb') as file:
 								pickle.dump(self.world, file)
 					elif 715 <= pygame.mouse.get_pos()[1] <= 778:
