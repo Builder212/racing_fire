@@ -1,9 +1,9 @@
 import pygame, time, random, pickle
 
 class main_game:
-	def __init__(self, x=350, y=814):
+	def __init__(self, x=350, y=600):
 		pygame.init()
-		pygame.display.set_caption('Firebird')
+		pygame.display.set_caption('Racing Fire')
 		self.screen = pygame.display.set_mode((x, y))
 
 		self.running = True
@@ -40,10 +40,10 @@ class main_game:
 		self.highscore_string = str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
 
-		self.start_clicked = pygame.image.load("textures/main_menu/menu_start_clicked.png").convert_alpha()
-		self.exit_clicked = pygame.image.load("textures/main_menu/menu_exit_clicked.png").convert_alpha()
-		self.options_clicked = pygame.image.load("textures/main_menu/menu_options_clicked.png").convert_alpha()
-		self.menu_background = pygame.image.load("textures/main_menu/menu_background.png").convert_alpha()
+		self.start_clicked = pygame.image.load("textures/main_menu/start_selected.png").convert_alpha()
+		self.exit_clicked = pygame.image.load("textures/main_menu/exit_selected.png").convert_alpha()
+		self.options_clicked = pygame.image.load("textures/main_menu/settings_selected.png").convert_alpha()
+		self.menu_background = pygame.image.load("textures/main_menu/menu_selected.png").convert_alpha()
 
 		self.menu_clicked = pygame.image.load("textures/exit_menu/menu_button_hover.png").convert_alpha()
 		self.death_screen = pygame.image.load("textures/exit_menu/exit_menu.png").convert_alpha()
