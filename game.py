@@ -1,6 +1,6 @@
 import pygame, time, random, pickle
 
-class main_game:
+class racing_fire:
 	def __init__(self, x=350, y=600):
 		pygame.init()
 
@@ -104,6 +104,8 @@ class main_game:
 		self.selected_car = pygame.image.load("textures/settings_menu/select_car.png").convert_alpha()
 		self.hover_car = pygame.image.load("textures/settings_menu/hover_car.png").convert_alpha()
 		self.options_screen = pygame.image.load("textures/settings_menu/settings_background.png").convert_alpha()
+		self.more_car_hover = pygame.image.load("textures/settings_menu/more_cars_hover.png").convert_alpha()
+		self.more_background_hover = pygame.image.load("textures/settings_menu/more_background_hover.png").convert_alpha()
 
 		#car
 		self.firebird = pygame.image.load("textures/cars/firebird.png").convert_alpha()
@@ -402,6 +404,19 @@ class main_game:
 					else:
 						pass
 
+				elif 392 <= pygame.mouse.get_pos()[1] <= 414:
+					if 11 <= pygame.mouse.get_pos()[0] <= 229:
+						self.screen.blit(self.more_car_hover, (11, 392))
+						pygame.display.update()
+					else:
+						pass
+				elif 249 <= pygame.mouse.get_pos()[1] <= 273:
+					if 11 <= pygame.mouse.get_pos()[0] <= 280:
+						self.screen.blit(self.more_background_hover, (11, 249))
+						pygame.display.update()
+					else:
+						pass
+
 				elif 143 <= pygame.mouse.get_pos()[1] <= 243:
 					if 13 <= pygame.mouse.get_pos()[0] <= 113: #default
 						self.screen.blit(self.background_hover, (13, 143))
@@ -493,6 +508,17 @@ class main_game:
 						else:
 							pass
 
+					elif 392 <= pygame.mouse.get_pos()[1] <= 414:
+						if 11 <= pygame.mouse.get_pos()[0] <= 229:
+							print("More cars will come later!")
+						else:
+							pass
+					elif 249 <= pygame.mouse.get_pos()[1] <= 273:
+						if 11 <= pygame.mouse.get_pos()[0] <= 280:
+							print("More backgrounds will come later!")
+						else:
+							pass
+
 					elif 142 <= pygame.mouse.get_pos()[1] <= 242:
 						if 11 <= pygame.mouse.get_pos()[0] <= 111: #default
 							self.world = 0
@@ -573,5 +599,5 @@ class main_game:
 		exit()
 
 if __name__ == "__main__":
-	game = main_game()
+	game = racing_fire()
 	game.mainloop()
