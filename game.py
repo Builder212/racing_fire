@@ -34,7 +34,7 @@ class main_game:
 
 		#grass terrain
 		self.grass_terrain = pygame.image.load("textures/scenery/road/grass_background.png").convert_alpha()
-		self.road = pygame.image.load("textures/scenery/road/road_background.png").convert_alpha()
+		self.drive = pygame.image.load("textures/scenery/road/road_background.png").convert_alpha()
 		self.obstacle = pygame.image.load("textures/scenery/road/pothole.png").convert_alpha()
 
 		#ice terrain
@@ -58,7 +58,7 @@ class main_game:
 
 		if self.world == 0:
 			self.terrain = self.grass_terrain
-			self.road = self.road
+			self.road = self.drive
 			self.obstacle = self.obstacle
 		elif self.world == 1:
 			self.terrain = self.snow_terrain
@@ -101,9 +101,11 @@ class main_game:
 		self.selected_background = pygame.image.load("textures/settings_menu/selected_background.png").convert_alpha()
 		self.options_screen = pygame.image.load("textures/settings_menu/settings_background.png").convert_alpha()
 
+		#car
 		self.car = pygame.image.load("textures/cars/firebird.png").convert_alpha()
-		self.car_hitbox = (self.x, self.y, 51, 111)
+		self.car_hitbox = (self.x, self.y, self.car.get_rect().width, self.car.get_rect().height)
 
+		#obstacle
 		self.obstacle_side = random.randrange(30, 100)
 		self.obstacle_angle = random.randrange(0, 360)
 		self.obstacle_startx = random.randrange(25, (self.display_width-25-self.obstacle_side))
@@ -126,16 +128,14 @@ class main_game:
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				exit()
-			if event.type == pygame.KEYDOWN:
+			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					self.x_change = -.5
 				elif event.key == pygame.K_RIGHT:
 					self.x_change = .5
 				else:
 					pass
-			else:
-				pass
-			if event.type == pygame.KEYUP:
+			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					self.x_change = 0
 				else:
@@ -151,11 +151,9 @@ class main_game:
 
 	def scrolling_road(self):
 		y = self.y_val % self.road.get_rect().height
-		self.screen.blit(self.terrain, (0, (int(y-self.terrain.get_rect().height))))
-		self.screen.blit(self.road, (25, (int(y-self.road.get_rect().height))))
+		self.screen.blits(blit_sequence = ((self.terrain, (0, int(y-self.terrain.get_rect().height))), (self.road, (25, int(y-self.road.get_rect().height)))))
 		if y < 814:
-			self.screen.blit(self.terrain, (0, int(y)))
-			self.screen.blit(self.road, (25, int(y)))
+			self.screen.blits(blit_sequence = ((self.terrain, (0, int(y))), (self.road, (25, int(y)))))
 		else:
 			pass
 		self.y_val += self.speed
@@ -186,10 +184,13 @@ class main_game:
 		self.highscore_string = str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
 		self.distance_render = self.font.render(str(int(self.distance)), True, (255, 255, 255))
-		self.screen.blit(self.high_score_render, (60, 760))
 		pygame.display.update()
 
 	def end_screen(self):
+		self.screen.blit(self.death_screen, (0,0))
+		self.screen.blit(self.high_score_render, (220, 570))
+		self.screen.blit(self.distance_render, (212, 278))
+		pygame.display.update()
 		while self.end == True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -220,14 +221,14 @@ class main_game:
 			pass
 
 	def set_speed(self):
-		if self.distance >= 10 and self.distance % 10 == 0:
-			self.speed = 0.3 + (self.distance // 10)
+		if self.distance >= 10 and self.distance % 5 == 0:
+			self.speed += (self.distance // 10)
 
 	def gameplay(self):
 		self.obstacle_side = random.randrange(30, 100)
 		self.obstacle_angle = random.randrange(0, 360)
 		self.obstacle_startx = random.randrange(25, (self.display_width-25-self.obstacle_side))
-		self.obstacle_starty = -300
+		self.obstacle_starty = -50
 		self.obstacle_hitbox = ((self.obstacle_side/2), self.obstacle_startx, self.obstacle_starty)
 
 		self.speed = .3
@@ -389,7 +390,7 @@ class main_game:
 						if 11 <= pygame.mouse.get_pos()[0] <= 111: #default
 							self.world = 0
 							self.terrain = self.grass_terrain
-							self.road = self.grass_road
+							self.road = self.drive
 							self.obstacle = self.obstacle
 							with open('data/world.dat', 'wb') as file:
 								pickle.dump(self.world, file)
