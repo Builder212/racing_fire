@@ -3,16 +3,19 @@ import pygame, time, random, pickle
 class main_game:
 	def __init__(self, x=350, y=600):
 		pygame.init()
+
+		#display
 		pygame.display.set_caption('Racing Fire')
 		self.screen = pygame.display.set_mode((x, y))
+		self.display_width, self.display_height = x, y
+		self.x, self.y = self.display_width*0.45, self.display_height*0.8
 
-		self.running = True
-		self.menu = True
-		self.game = False
-		self.end = False
-		self.options = False
+		#in game loop variables
+		self.running, self.menu, self.game, self.end, self.options = True, True, False, False, False
 
+		#music
 		self.soundtrack = pygame.mixer.music.load("soundtrack.mp3")
+
 		try:
 			with open('data/music.dat', 'rb') as file:
 				self.music = pickle.load(file)
@@ -21,21 +24,16 @@ class main_game:
 			with open('data/music.dat', 'wb') as file:
 				pickle.dump(self.music, file)
 
-		self.display_width = x
-		self.display_height = y
-		self.x = self.display_width*0.45
-		self.y = self.display_height*0.8
-		self.x_change = 0
-		self.speed = 1
-		self.distance = 0
-		self.y_val = 0
+		#game variables
+		self.x_change, self.speed, self.distance, self.y_val = 0, 1, 0, 0
 
+		#font type
 		self.font = pygame.font.Font(pygame.font.get_default_font(), 36)
 
 		#grass terrain
 		self.grass_terrain = pygame.image.load("textures/scenery/road/grass_background.png").convert_alpha()
 		self.drive = pygame.image.load("textures/scenery/road/road_background.png").convert_alpha()
-		self.obstacle = pygame.image.load("textures/scenery/road/pothole.png").convert_alpha()
+		self.pothole = pygame.image.load("textures/scenery/road/pothole.png").convert_alpha()
 
 		#ice terrain
 		self.snow_terrain = pygame.image.load("textures/scenery/ice/snow_background.png").convert_alpha()
@@ -59,7 +57,7 @@ class main_game:
 		if self.world == 0:
 			self.terrain = self.grass_terrain
 			self.road = self.drive
-			self.obstacle = self.obstacle
+			self.obstacle = self.pothole
 		elif self.world == 1:
 			self.terrain = self.snow_terrain
 			self.road = self.ice_road
@@ -68,6 +66,10 @@ class main_game:
 			self.terrain = self.jungle_terrain
 			self.road = self.dirt_road
 			self.obstacle = self.rocks
+		else:
+			print("Your world.dat file has invalid data.")
+			pygame.quit()
+			exit()
 
 		#highscore
 		try:
@@ -99,26 +101,56 @@ class main_game:
 		self.options_exit = pygame.image.load("textures/settings_menu/back_selected.png").convert_alpha()
 		self.background_hover = pygame.image.load("textures/settings_menu/hover_background.png").convert_alpha()
 		self.selected_background = pygame.image.load("textures/settings_menu/selected_background.png").convert_alpha()
+		self.selected_car = pygame.image.load("textures/settings_menu/select_car.png").convert_alpha()
+		self.hover_car = pygame.image.load("textures/settings_menu/hover_car.png").convert_alpha()
 		self.options_screen = pygame.image.load("textures/settings_menu/settings_background.png").convert_alpha()
 
 		#car
-		self.car = pygame.image.load("textures/cars/firebird.png").convert_alpha()
+		self.firebird = pygame.image.load("textures/cars/firebird.png").convert_alpha()
+		self.car1 = pygame.image.load("textures/cars/car-1.png").convert_alpha()
+		self.car2 = pygame.image.load("textures/cars/car-2.png").convert_alpha()
+		self.car4 = pygame.image.load("textures/cars/car-4.png").convert_alpha()
+		self.car5 = pygame.image.load("textures/cars/car-5.png").convert_alpha()
+		self.car7 = pygame.image.load("textures/cars/car-7.png").convert_alpha()
+
+		try:
+			with open('data/car.dat', 'rb') as file:
+				self.car_choice = pickle.load(file)
+		except:
+			self.car_choice = 0
+			with open('data/car.dat', 'wb') as file:
+				pickle.dump(self.car_choice, file)
+
+		if self.car_choice == 0:
+			self.car = self.firebird
+		elif self.car_choice == 1:
+			self.car = self.car4
+		elif self.car_choice == 2:
+			self.car = self.car7
+		elif self.car_choice == 3:
+			self.car = self.car5
+		elif self.car_choice == 4:
+			self.car = self.car2
+		elif self.car_choice == 5:
+			self.car = self.car1
+		else:
+			print("Your car.dat file has invalid data.")
+			pygame.quit()
+			exit()
+
 		self.car_hitbox = (self.x, self.y, self.car.get_rect().width, self.car.get_rect().height)
 
 		#obstacle
-		self.obstacle_side = random.randrange(30, 100)
-		self.obstacle_angle = random.randrange(0, 360)
-		self.obstacle_startx = random.randrange(25, (self.display_width-25-self.obstacle_side))
-		self.obstacle_starty = -300
+		self.obstacle_side, self.obstacle_angle = random.randrange(30, 100), random.randrange(0, 360)
+		self.obstacle_startx, self.obstacle_starty = random.randrange(25, (self.display_width-25-self.obstacle_side)), -10
 		self.obstacle_hitbox = ((self.obstacle_side/2), self.obstacle_startx, self.obstacle_starty)
 
 	def main_menu_setup(self):
-		self.screen.blit(self.menu_background, (0,0))
-		self.screen.blit(self.high_score_render, (220, 570))
+		self.screen.blits(blit_sequence = ((self.menu_background, (0,0)), (self.high_score_render, (218, 569))))
 		pygame.display.update()
+
 	def initial_load(self):
-		self.screen.blit(self.terrain, (0,0))
-		self.screen.blit(self.road, (25,0))
+		self.screen.blits(blit_sequence = ((self.terrain, (0,0)), (self.road, (25,0))))
 
 	def move_car(self, x, y):
 		self.screen.blit(self.car, (int(x), int(y)))
@@ -130,9 +162,9 @@ class main_game:
 				exit()
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					self.x_change = -.5
+					self.x_change = -.3
 				elif event.key == pygame.K_RIGHT:
-					self.x_change = .5
+					self.x_change = .3
 				else:
 					pass
 			elif event.type == pygame.KEYUP:
@@ -167,49 +199,62 @@ class main_game:
 	def obstacle_onscreen(self):
 		if self.obstacle_starty > self.display_height:
 			self.obstacle_starty = 0 - self.obstacle_side
-			self.obstacle_side = random.randrange(30, 100)
-			self.obstacle_angle = random.randrange(0, 360)
+			self.obstacle_side, self.obstacle_angle = random.randrange(50, 70), random.randrange(0, 360)
 			self.obstacle_startx = random.randrange(25, (self.display_width-25-self.obstacle_side))
 		else:
 			pass
 
 	def crash(self):
-		self.game = False
-		self.end = True
+		self.game, self.end = False, True
 		self.screen.blit(self.death_screen, (0,0))
+
 		if int(self.distance) >= self.highscore:
 			self.highscore = int(self.distance)
 			with open('data/highscore.dat', 'wb') as file:
 				pickle.dump(self.highscore, file)
+		else:
+			pass
+
 		self.highscore_string = str(self.highscore)
 		self.high_score_render = self.font.render(self.highscore_string, True, (255, 255, 255))
 		self.distance_render = self.font.render(str(int(self.distance)), True, (255, 255, 255))
 		pygame.display.update()
 
 	def end_screen(self):
-		self.screen.blit(self.death_screen, (0,0))
-		self.screen.blit(self.high_score_render, (220, 570))
-		self.screen.blit(self.distance_render, (212, 278))
+		self.screen.blits(blit_sequence = ((self.death_screen, (0,0)), (self.high_score_render, (220, 568)), (self.distance_render, (212, 281))))
 		pygame.display.update()
+
 		while self.end == True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
+				else:
+					pass
+
 				if 85 <= pygame.mouse.get_pos()[0] <= 261:
 					if 505 <= pygame.mouse.get_pos()[1] <= 552:
 						self.screen.blit(self.menu_clicked, (85, 505))
 						pygame.display.update()
 					else:
 						self.screen.blit(self.death_screen, (0,0))
-						self.screen.blit(self.high_score_render, (220, 570))
-						self.screen.blit(self.distance_render, (212, 278))
+						self.screen.blit(self.high_score_render, (220, 568))
+						self.screen.blit(self.distance_render, (212, 281))
 						pygame.display.update()
+				else:
+					pass
+
 				if pygame.mouse.get_pressed()[0] == 1: # menu
 					if 85 <= pygame.mouse.get_pos()[0] <= 261:
 						if 505 <= pygame.mouse.get_pos()[1] <= 552:
 							self.end = False
 							self.menu = True
+						else:
+							pass
+					else:
+						pass
+				else:
+					pass
 
 	def is_collision(self):
 		self.car_hitbox = (self.x, self.y, 51, 111)
@@ -217,25 +262,28 @@ class main_game:
 		if self.car_hitbox[1] < (self.obstacle_hitbox[2]-self.obstacle_hitbox[0]+60) < (self.car_hitbox[1]+self.car_hitbox[3]):
 			if self.car_hitbox[0] < self.obstacle_hitbox[1] < (self.car_hitbox[0]+self.car_hitbox[2]) or self.car_hitbox[0] < (self.obstacle_hitbox[1]+self.obstacle_hitbox[0]) < (self.car_hitbox[0]+self.car_hitbox[2]):
 				self.crash()
+			else:
+				pass
 		else:
 			pass
 
 	def set_speed(self):
 		if self.distance >= 10 and self.distance % 5 == 0:
 			self.speed += (self.distance // 10)
+		else:
+			pass
 
 	def gameplay(self):
-		self.obstacle_side = random.randrange(30, 100)
-		self.obstacle_angle = random.randrange(0, 360)
-		self.obstacle_startx = random.randrange(25, (self.display_width-25-self.obstacle_side))
-		self.obstacle_starty = -50
+		self.obstacle_side, self.obstacle_angle = random.randrange(30, 100), random.randrange(0, 360)
+		self.obstacle_startx, self.obstacle_starty = random.randrange(25, (self.display_width-25-self.obstacle_side)), -10
 		self.obstacle_hitbox = ((self.obstacle_side/2), self.obstacle_startx, self.obstacle_starty)
 
 		self.speed = .3
 		self.distance = 0
 		self.initial_load()
+
 		while self.game == True:
-			self.distance += 0.0005
+			self.distance += 0.0001
 			self.score_render = self.font.render(str(int(self.distance)), True, (255, 255, 255))
 			self.events()
 			self.car_onscreen()
@@ -250,7 +298,8 @@ class main_game:
 
 	def main_menu(self):
 		self.main_menu_setup()
-		self.options == False
+		self.options = False
+
 		while self.menu == True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -302,12 +351,31 @@ class main_game:
 		self.options = True
 		self.menu = False
 		self.screen.blit(self.options_screen, (0,0))
+
 		if self.world == 0:
 			self.screen.blit(self.selected_background, (13, 143))
 		elif self.world == 1:
 			self.screen.blit(self.selected_background, (126, 143))
 		elif self.world == 2:
 			self.screen.blit(self.selected_background, (238, 143))
+		else:
+			pass
+
+		if self.car_choice == 0:
+			self.screen.blit(self.selected_car, (10, 275))
+		elif self.car_choice == 1:
+			self.screen.blit(self.selected_car, (63, 275))
+		elif self.car_choice == 2:
+			self.screen.blit(self.selected_car, (118, 275))
+		elif self.car_choice == 3:
+			self.screen.blit(self.selected_car, (174, 275))
+		elif self.car_choice == 4:
+			self.screen.blit(self.selected_car, (230, 275))
+		elif self.car_choice == 5:
+			self.screen.blit(self.selected_car, (284, 275))
+		else:
+			pass
+
 		pygame.display.update()
 		while self.options == True:
 			for event in pygame.event.get():
@@ -347,6 +415,28 @@ class main_game:
 					else:
 						pass
 
+				elif 275 <= pygame.mouse.get_pos()[1] <= 392:
+					if 10 <= pygame.mouse.get_pos()[0] <= 62: #firebird
+						self.screen.blit(self.hover_car, (10, 275))
+						pygame.display.update()
+					elif 63 <= pygame.mouse.get_pos()[0] <= 115: #car4
+						self.screen.blit(self.hover_car, (63, 275))
+						pygame.display.update()
+					elif 118 <= pygame.mouse.get_pos()[0] <= 171: #car7
+						self.screen.blit(self.hover_car, (118, 275))
+						pygame.display.update()
+					elif 174 <= pygame.mouse.get_pos()[0] <= 229: #car5
+						self.screen.blit(self.hover_car, (174, 275))
+						pygame.display.update()
+					elif 230 <= pygame.mouse.get_pos()[0] <= 281: #car2
+						self.screen.blit(self.hover_car, (230, 275))
+						pygame.display.update()
+					elif 284 <= pygame.mouse.get_pos()[0] <= 339: #car1
+						self.screen.blit(self.hover_car, (284, 275))
+						pygame.display.update()
+					else:
+						pass
+
 				else:
 					self.screen.blit(self.options_screen, (0,0))
 					if self.world == 0:
@@ -355,6 +445,23 @@ class main_game:
 						self.screen.blit(self.selected_background, (126, 143))
 					elif self.world == 2:
 						self.screen.blit(self.selected_background, (238, 143))
+					else:
+						pass
+
+					if self.car_choice == 0:
+						self.screen.blit(self.selected_car, (10, 275))
+					elif self.car_choice == 1:
+						self.screen.blit(self.selected_car, (63, 275))
+					elif self.car_choice == 2:
+						self.screen.blit(self.selected_car, (118, 275))
+					elif self.car_choice == 3:
+						self.screen.blit(self.selected_car, (174, 275))
+					elif self.car_choice == 4:
+						self.screen.blit(self.selected_car, (230, 275))
+					elif self.car_choice == 5:
+						self.screen.blit(self.selected_car, (284, 275))
+					else:
+						pass
 
 					pygame.display.update()
 
@@ -409,19 +516,57 @@ class main_game:
 							with open('data/world.dat', 'wb') as file:
 								pickle.dump(self.world, file)
 
+					elif 275 <= pygame.mouse.get_pos()[1] <= 392:
+						if 10 <= pygame.mouse.get_pos()[0] <= 62: #firebird
+							self.car = self.firebird
+							self.car_choice = 0
+							with open('data/car.dat', 'wb') as file:
+								pickle.dump(self.car_choice, file)
+						elif 63 <= pygame.mouse.get_pos()[0] <= 115: #car4
+							self.car = self.car4
+							self.car_choice = 1
+							with open('data/car.dat', 'wb') as file:
+								pickle.dump(self.car_choice, file)
+						elif 118 <= pygame.mouse.get_pos()[0] <= 171: #car7
+							self.car = self.car7
+							self.car_choice = 2
+							with open('data/car.dat', 'wb') as file:
+								pickle.dump(self.car_choice, file)
+						elif 174 <= pygame.mouse.get_pos()[0] <= 229: #car5
+							self.car = self.car5
+							self.car_choice = 3
+							with open('data/car.dat', 'wb') as file:
+								pickle.dump(self.car_choice, file)
+						elif 230 <= pygame.mouse.get_pos()[0] <= 281: #car2
+							self.car = self.car2
+							self.car_choice = 4
+							with open('data/car.dat', 'wb') as file:
+								pickle.dump(self.car_choice, file)
+						elif 284 <= pygame.mouse.get_pos()[0] <= 339: #car1
+							self.car = self.car1
+							self.car_choice = 5
+							with open('data/car.dat', 'wb') as file:
+								pickle.dump(self.car_choice, file)
+						else:
+							pass
+
 		if self.menu == True:
 			self.main_menu()
+		else:
+			pass
 
 	def mainloop(self):
 		if self.music == 0:
 			pygame.mixer.music.play(-1)
 		else:
 			pass
+
 		while self.running == True:
 			self.main_menu()
 			self.initial_load()
 			self.gameplay()
 			self.end_screen()
+
 		pygame.mixer.music.stop()
 		pygame.mixer.music.unload()
 		pygame.quit()
