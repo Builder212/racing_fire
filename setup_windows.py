@@ -17,8 +17,7 @@ shortcut_table = [
      None,                     # IconIndex
      None,                     # ShowCmd
      'TARGETDIR'               # WkDir
-     ),
-    ]
+),]
 
 msi_data = {"Shortcut": shortcut_table}
 bdist_msi_options = {'data': msi_data}
@@ -35,5 +34,4 @@ cx_Freeze.setup(
     "bdist_msi": bdist_msi_options
     },
     executables = executables
-
-    )
+)
