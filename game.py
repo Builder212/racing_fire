@@ -1,4 +1,4 @@
-import pygame, time, random, pickle
+import pygame, time, random, pickle, sys
 
 class racing_fire:
 	def __init__(self, x=350, y=600):
@@ -72,7 +72,7 @@ class racing_fire:
 		else:
 			print("Your world.dat file has invalid data.")
 			pygame.quit()
-			exit()
+			sys.exit()
 
 		#highscore
 		try:
@@ -141,7 +141,7 @@ class racing_fire:
 		else:
 			print("Your car.dat file has invalid data.")
 			pygame.quit()
-			exit()
+			sys.exit()
 
 		self.car_hitbox = (self.x, self.y, self.car.get_rect().width, self.car.get_rect().height)
 
@@ -170,7 +170,7 @@ class racing_fire:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
-				exit()
+				sys.exit()
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					self.x_change = -.3
@@ -239,7 +239,7 @@ class racing_fire:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
-					exit()
+					sys.exit()
 				else:
 					pass
 
@@ -318,7 +318,7 @@ class racing_fire:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
-					exit()
+					sys.exit()
 
 				if 35 <= pygame.mouse.get_pos()[0] <= 315:
 					if 216 <= pygame.mouse.get_pos()[1] <= 306: #start
@@ -349,7 +349,7 @@ class racing_fire:
 							if 35 <= pygame.mouse.get_pos()[0] <= 160: #settings
 								self.options_menu()
 							elif 190 <= pygame.mouse.get_pos()[0] <= 315: #exit
-								exit()
+								sys.exit()
 
 			is_hover_last = is_hover
 
@@ -387,7 +387,7 @@ class racing_fire:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
-					exit()
+					sys.exit()
 				else:
 					pass
 
@@ -600,7 +600,7 @@ class racing_fire:
 		pygame.mixer.music.stop()
 		pygame.mixer.music.unload()
 		pygame.quit()
-		exit()
+		sys.exit()
 
 if __name__ == "__main__":
 	game = racing_fire()
