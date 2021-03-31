@@ -1,4 +1,5 @@
 from game import racing_fire
 
-game = racing_fire()
-game.mainloop()
+if __name__ == "__main__":
+    game = racing_fire()
+    game.mainloop()

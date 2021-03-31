@@ -14,7 +14,10 @@ class racing_fire:
 		self.running, self.menu, self.game, self.end, self.options = True, True, False, False, False
 
 		#music
-		self.soundtrack = pygame.mixer.music.load("soundtrack.mp3")
+		try:
+			self.soundtrack = pygame.mixer.music.load("music/racing_fire.mp3")
+		except:
+			self.soundtrack = pygame.mixer.music.load("music/racing_fire.ogg")
 
 		try:
 			with open('data/music.dat', 'rb') as file:
@@ -146,6 +149,12 @@ class racing_fire:
 		self.obstacle_side, self.obstacle_angle = random.randrange(30, 100), random.randrange(0, 360)
 		self.obstacle_startx, self.obstacle_starty = random.randrange(25, (self.display_width-25-self.obstacle_side)), -10
 		self.obstacle_hitbox = ((self.obstacle_side/2), self.obstacle_startx, self.obstacle_starty)
+
+		self.intro = pygame.image.load("textures/intro/intro.png").convert_alpha()
+
+		self.screen.blit(self.intro, (0,0))
+		pygame.display.update()
+		pygame.time.wait(5000)
 
 	def main_menu_setup(self):
 		self.screen.blits(blit_sequence = ((self.menu_background, (0,0)), (self.high_score_render, (218, 569))))
@@ -302,13 +311,14 @@ class racing_fire:
 		self.main_menu_setup()
 		self.options = False
 
+		is_hover = 0
+		is_hover_last = 0
+
 		while self.menu == True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					exit()
-				else:
-					pass
 
 				if 35 <= pygame.mouse.get_pos()[0] <= 315:
 					if 216 <= pygame.mouse.get_pos()[1] <= 306: #start
@@ -321,12 +331,12 @@ class racing_fire:
 						elif 190 <= pygame.mouse.get_pos()[0] <= 315: #exit
 							self.screen.blit(self.exit_clicked, (193, 312))
 							pygame.display.update()
-						else:
-							self.main_menu_setup()
+							is_hover = 1
 					else:
-						self.main_menu_setup()
-				else:
-					pass
+						is_hover = 0
+
+				if is_hover_last == 1 and is_hover == 0:
+					self.main_menu_setup()
 
 				if pygame.mouse.get_pressed()[0] == 1:
 					if 35 <= pygame.mouse.get_pos()[0] <= 315:
@@ -340,14 +350,8 @@ class racing_fire:
 								self.options_menu()
 							elif 190 <= pygame.mouse.get_pos()[0] <= 315: #exit
 								exit()
-							else:
-								pass
-						else:
-							pass
-					else:
-						pass
-				else:
-					pass
+
+			is_hover_last = is_hover
 
 	def options_menu(self):
 		self.options = True
